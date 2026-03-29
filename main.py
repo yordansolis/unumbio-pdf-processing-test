@@ -77,23 +77,34 @@ def main() -> None:
     print(f"📁 Output: {OUTPUT_FILE}")
     print()
 
-    print("⏳ Loading bulletin...")
-    pages = load_bulletin(INPUT_FILE)
-    print(f"   ✅ {len(pages)} pages loaded")
+    try:
+        print("⏳ Loading bulletin...")
+        pages = load_bulletin(INPUT_FILE)
+        print(f"   ✅ {len(pages)} pages loaded")
 
-    print(f"⏳ Filtering section {SECTION_START} → {SECTION_END}...")
-    b1_pages = filter_section(pages, SECTION_START, SECTION_END)
-    print(f"   ✅ {len(b1_pages)} pages in section")
+        print(f"⏳ Filtering section {SECTION_START} → {SECTION_END}...")
+        b1_pages = filter_section(pages, SECTION_START, SECTION_END)
+        print(f"   ✅ {len(b1_pages)} pages in section")
 
-    print("⏳ Extracting records...")
-    records = build_records(b1_pages, split_columns)
-    print(f"   ✅ {len(records)} records found")
+        print("⏳ Extracting records...")
+        records = build_records(b1_pages, split_columns)
+        print(f"   ✅ {len(records)} records found")
 
-    print("⏳ Exporting output JSON...")
-    export_json(records, OUTPUT_FILE)
+        print("⏳ Exporting output JSON...")
+        export_json(records, OUTPUT_FILE)
 
-    print()
-    print("🎉 All done!")
+        print()
+        print("🎉 All done!")
+
+    except FileNotFoundError as exc:
+        print(f"\n❌ File not found: {exc}", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as exc:
+        print(f"\n❌ Processing error: {exc}", file=sys.stderr)
+        sys.exit(1)
+    except OSError as exc:
+        print(f"\n❌ I/O error: {exc}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

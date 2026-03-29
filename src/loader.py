@@ -33,8 +33,11 @@ def load_bulletin(path: str | Path) -> list[dict]:
     if not path.exists():
         raise FileNotFoundError(f"Input file not found: {path}")
 
-    with path.open(encoding="utf-8") as fh:
-        data = json.load(fh)
+    try:
+        with path.open(encoding="utf-8") as fh:
+            data = json.load(fh)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Invalid JSON in {path}: {exc}") from exc
 
     if not isinstance(data, list):
         raise ValueError(f"Expected a JSON list, got {type(data).__name__}")
