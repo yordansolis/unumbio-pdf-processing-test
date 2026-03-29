@@ -1,0 +1,30 @@
+{
+    "paginas": [
+        {
+            "page": 1,
+            "textboxhorizontal": [
+                {
+                    "text": "B.1 MARCAS REGISTRADAS",
+                    "x0": 50,
+                    "x1": 200,
+                    "top": 100,
+                    "bottom": 120
+                },
+                {
+                    "text": "111",
+                    "x0": 50,
+                    "x1": 80,
+                    "top": 150,
+                    "bottom": 170
+                },
+                {
+                    "text": "NOVA BRAND",
+                    "x0": 90,
+                    "x1": 300,
+                    "top": 150,
+                    "bottom": 170
+                }
+            ]
+        }
+    ]
+}

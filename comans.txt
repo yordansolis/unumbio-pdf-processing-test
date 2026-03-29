@@ -1,0 +1,48 @@
+python3 -c "
+import json
+with open('/Users/jhordanandresasprillasolis/Documents/GitHub/unumbio-pdf-processing-test/TECHNICAL-TEST/BUL_EM_TM_2024000007_001.json') as f:
+    data = json.load(f)
+
+# Overview: pages, sections mentioned in text
+print('Total pages:', len(data))
+for page in data:
+    texts = [t['text'].strip() for t in page.get('textboxhorizontal', [])]
+    sections = [t for t in texts if t.startswith('B.') or t.startswith('A.') or t in ['PART A', 'PART B', 'B.1.', 'A.1.']]
+    if sections:
+        print(f'  Page {page[\"page\"]}: {sections[:5]}')
+"
+
+
+
+python3 -c "
+import json
+with open('/Users/jhordanandresasprillasolis/Documents/GitHub/unumbio-pdf-processing-test/TECHNICAL-TEST/BUL_EM_TM_2024000007_001.json') as f:
+    data = json.load(f)
+
+# Find page 89 (B.1 start) and show first ~30 text elements
+page89 = next(p for p in data if p['page'] == 89)
+print('=== PAGE 89 (B.1 START) ===')
+print(f'Page size: {page89[\"width\"]:.1f} x {page89[\"height\"]:.1f} pts')
+print(f'Mid-page x: ~{page89[\"width\"]/2:.1f}')
+print()
+for tb in page89['textboxhorizontal'][:40]:
+    side = 'LEFT ' if tb['x0'] < page89['width']/2 else 'RIGHT'
+    print(f'[{side}] x0={tb[\"x0\"]:6.1f} top={tb[\"top\"]:6.1f}  | {tb[\"text\"].strip()[:80]}')
+"
+
+
+python3 -c "
+import json
+with open('/Users/jhordanandresasprillasolis/Documents/GitHub/unumbio-pdf-processing-test/TECHNICAL-TEST/BUL_EM_TM_2024000007_001.json') as f:
+    data = json.load(f)
+
+# Show a full page that has TWO columns (B.1 interior page)
+page90 = next(p for p in data if p['page'] == 90)
+print('=== PAGE 90 (B.1 - TWO COLUMNS) ===')
+print(f'Page size: {page90[\"width\"]:.1f} x {page90[\"height\"]:.1f}')
+print()
+elems = sorted(page90['textboxhorizontal'], key=lambda e: (round(e['top']/5)*5, e['x0']))
+for tb in elems[:60]:
+    side = 'L' if tb['x0'] < 297 else 'R'
+    print(f'[{side}] x0={tb[\"x0\"]:6.1f} top={tb[\"top\"]:6.1f} | {tb[\"text\"].strip()[:70]}')
+"
