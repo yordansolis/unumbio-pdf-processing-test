@@ -309,6 +309,45 @@ Write output JSON  →  BUL_EM_TM_2024000007_002.json
 
 ---
 
+## Design Decisions
+
+> Full rationale in [docs/memoria_descriptiva.md](docs/memoria_descriptiva.md).
+
+### Why `x0 < 255` as the column split?
+
+Inspection of the actual data shows a natural gap in `x0` values between the two columns:
+
+| Column | Label x0 | Value x0 |
+|--------|----------|----------|
+| Left   | ≈ 56.7   | ≈ 79.4   |
+| Right  | ≈ 311.8  | ≈ 334.5  |
+
+255 sits squarely in the dead zone between them. A simple threshold is sufficient here because the PDF layout is rigidly structured — no element ever falls between ~80 and ~311.
+
+### Why pair labels and values by `top` proximity (±4 pt) instead of index?
+
+PDFPlumber does not guarantee that sibling elements appear consecutively in the flat list. Using `top` proximity is layout-independent: it works regardless of extraction order and remains stable even when a value element spans multiple lines.
+
+The 4 pt tolerance was determined empirically — it is wide enough to absorb minor baseline shifts between a label and its value, and narrow enough not to accidentally merge elements from adjacent rows (row height ≈ 12–14 pt).
+
+### Why process left column before right, not top-to-bottom across the full page?
+
+A naïve global top-to-bottom sort would interleave elements from both columns, producing malformed records. Processing each column independently preserves the left → right reading order mandated by the bulletin layout.
+
+### Why use a `pending` record instead of flushing at column boundaries?
+
+A record can start at the bottom of one column and continue at the top of the next — there is no marker in the data that signals "record continues". Holding the last open record as `pending` until the next column or page confirms it is complete is the only safe way to assemble cross-column records without lookahead.
+
+### Known limitations
+
+| Limitation | Impact |
+|------------|--------|
+| `x0 = 255` threshold is hardcoded to this bulletin's layout | Would need adjustment for bulletins with different margins |
+| Section detection relies on exact strings `"B.1."` / `"B.2."` | Any OCR noise or encoding variation in those markers would cause incorrect page slicing |
+| `400` is the only field stored as `list[str]` | Any other multi-line field added in future bulletins would require a config change (`LIST_FIELDS`) |
+
+---
+
 ## Quick Reference — Why Coordinates Matter
 
 | # | Purpose | Field used |
