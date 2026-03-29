@@ -26,13 +26,46 @@ Technical test: extract trademark records from a PDF bulletin JSON into a struct
 └── README.md
 ```
 
-### Running the script
+### Getting started
+
+Clone the repo and run the one-time setup:
 
 ```bash
-python main.py
+git clone <repo-url>
+cd unumbio-pdf-processing-test
+
+make setup   # creates .venv, installs deps, copies .env from .env.example
+make start   # runs the pipeline
 ```
 
-Reads `TECHNICAL-TEST/BUL_EM_TM_2024000007_001.json` and writes `output/BUL_EM_TM_2024000007_002.json`.
+### Available commands
+
+| Command | Description |
+|---------|-------------|
+| `make setup` | First-time setup: create venv + install deps + copy `.env` |
+| `make install` | Re-install / sync dependencies (use after `git pull`) |
+| `make start` | Run the processing pipeline |
+| `make clean` | Delete generated files in `output/` |
+| `make help` | List all available commands |
+
+### Expected output
+
+```
+📄 Input:  .../TECHNICAL-TEST/BUL_EM_TM_2024000007_001.json
+📁 Output: .../output/BUL_EM_TM_2024000007_002.json
+
+⏳ Loading bulletin...
+   ✅ 166 pages loaded
+⏳ Filtering section B.1. → B.2....
+   ✅ 34 pages in section
+⏳ Extracting records...
+   ✅ 551 records found
+⏳ Exporting output JSON...
+
+🎉 All done!
+```
+
+> **Python version:** requires Python 3.7+. The `|` union type syntax is handled via `from __future__ import annotations` in each module.
 
 ---
 

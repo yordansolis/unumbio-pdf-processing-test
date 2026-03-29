@@ -10,6 +10,8 @@ Each element in the list represents one page with the following keys:
   - rects, line: geometric elements (not used here)
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 

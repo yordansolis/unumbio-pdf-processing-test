@@ -13,6 +13,8 @@ The function returns only the pages that belong to the target section, so
 downstream modules do not need to be aware of the rest of the bulletin.
 """
 
+from __future__ import annotations
+
 import os
 
 SECTION_START: str = os.environ.get("SECTION_START", "B.1.")
