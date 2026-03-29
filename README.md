@@ -65,7 +65,7 @@ make start   # runs the pipeline
 🎉 All done!
 ```
 
-> **Python version:** requires Python 3.7+. The `|` union type syntax is handled via `from __future__ import annotations` in each module.
+> **Python version:** requires Python 3.11 (see `.python-version`). The `|` union type syntax is handled via `from __future__ import annotations` for backwards compatibility.
 
 ---
 
