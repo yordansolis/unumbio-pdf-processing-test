@@ -4,25 +4,32 @@ column_parser.py
 Splits a page's text elements into left and right columns based on x0,
 then sorts each column top-to-bottom.
 
-Column boundaries (measured in points on a ~595 pt wide page):
+Configurable via environment variables:
+
+  COLUMN_SPLIT     — x0 threshold (pts) dividing left from right column (default: 255.0)
+  HEADER_PREFIXES  — comma-separated text prefixes that identify page
+                     header/footer elements to skip (default: EUTM ,Part B,PART B,Part A,PART A)
+
+Column boundaries observed in BUL_EM_TM_2024000007 (~595 pt wide page):
   Left column:   INID label x0 ≈ 56.7,  value x0 ≈ 79.4
   Right column:  INID label x0 ≈ 311.8, value x0 ≈ 334.5
   Dividing line: x0 < COLUMN_SPLIT → left, x0 >= COLUMN_SPLIT → right
-
-The page header elements (e.g. "EUTM XXXXXXXXX", "Part B.1.") are
-filtered out before returning the columns.
 """
 
-COLUMN_SPLIT = 255.0  # horizontal dividing line in points
+import os
 
-# Text patterns that identify page header/footer elements to skip
-_HEADER_PREFIXES = ("EUTM ", "Part B", "PART B", "Part A", "PART A")
+COLUMN_SPLIT: float = float(os.environ.get("COLUMN_SPLIT", "255.0"))
+
+_HEADER_PREFIXES: tuple[str, ...] = tuple(
+    v.strip()
+    for v in os.environ.get("HEADER_PREFIXES", "EUTM ,Part B,PART B,Part A,PART A").split(",")
+    if v.strip()
+)
 
 
 def _is_header(text: str) -> bool:
     """Return True if the text element is a page header/footer to skip."""
-    t = text.strip()
-    return any(t.startswith(prefix) for prefix in _HEADER_PREFIXES)
+    return any(text.startswith(prefix) for prefix in _HEADER_PREFIXES)
 
 
 def _sorted_by_top(elements: list[dict]) -> list[dict]:

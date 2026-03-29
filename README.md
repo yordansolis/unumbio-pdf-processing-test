@@ -4,6 +4,74 @@ Technical test: extract trademark records from a PDF bulletin JSON into a struct
 
 ---
 
+## Project Structure
+
+```
+├── src/
+│   ├── __init__.py          — package marker
+│   ├── loader.py            — loads and validates the input JSON
+│   ├── section_filter.py    — detects B.1 start/end by text markers
+│   ├── column_parser.py     — splits elements left/right by x0, sorts by top
+│   ├── record_builder.py    — pairs labels+values, groups into records by INID 111
+│   └── exporter.py          — wraps records in {"B":{"1":[...]}} and writes JSON
+├── TECHNICAL-TEST/
+│   ├── BUL_EM_TM_2024000007_000.pdf   — original bulletin (visual reference)
+│   └── BUL_EM_TM_2024000007_001.json  — input: PDFPlumber extraction
+├── output/
+│   └── BUL_EM_TM_2024000007_002.json  — generated output
+├── docs/
+│   ├── UNNMBIO-PDF-PROCESSING.md      — original test specification
+│   └── memoria_descriptiva.md         — descriptive report
+├── main.py                  — pipeline entry point
+└── README.md
+```
+
+### Running the script
+
+```bash
+python main.py
+```
+
+Reads `TECHNICAL-TEST/BUL_EM_TM_2024000007_001.json` and writes `output/BUL_EM_TM_2024000007_002.json`.
+
+---
+
+## Configuration (`.env`)
+
+All tuneable values live in `.env` at the project root. The file is excluded from git (see `.gitignore`). Every variable has a hardcoded default in the source, so you only need to set what you want to override.
+
+### I/O
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `INPUT_FILE` | `TECHNICAL-TEST/BUL_EM_TM_2024000007_001.json` | PDFPlumber JSON extraction of the bulletin |
+| `OUTPUT_FILE` | `output/BUL_EM_TM_2024000007_002.json` | Destination for the generated output JSON |
+
+### Section filter (`src/section_filter.py`)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SECTION_START` | `B.1.` | Text that marks the **first page** of the target section |
+| `SECTION_END` | `B.2.` | Text that marks the **first page of the next** section (exclusive) |
+
+### Column parser (`src/column_parser.py`)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `COLUMN_SPLIT` | `255.0` | x0 threshold (PDF pts) separating left column from right |
+| `HEADER_PREFIXES` | `EUTM ,Part B,PART B,Part A,PART A` | Comma-separated prefixes of header/footer elements to ignore |
+
+### Record builder (`src/record_builder.py`)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `INID_CODES` | `111,151,450,210,400` | Comma-separated set of valid INID field labels |
+| `RECORD_START_CODE` | `111` | INID code that opens a new record |
+| `LIST_FIELDS` | `400` | Comma-separated codes stored as `list[str]` instead of `str` |
+| `TOP_TOLERANCE` | `4.0` | Max vertical distance (pts) to pair a label with its value |
+
+---
+
 ## Understanding the Input Data
 
 ### JSON coordinates — what they represent
